@@ -45,11 +45,12 @@ const Home = () => {
       }
 
       const data = await response.json();
-      setScanResult(data.result); // Store scan result
+      setScanResult(data.message);
       setUploadedFilename(data.filename); // Store updated filename
-    } catch (error) {
-      console.error("Upload Error:", error);
-      setScanResult("❌ Error scanning file");
+    } 
+    catch (error) {
+    console.error("Upload Error:", error);
+    setScanResult(`❌ Error: ${error.message}`);
     }
   };
 

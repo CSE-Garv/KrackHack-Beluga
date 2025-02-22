@@ -42,21 +42,32 @@ app.post("/upload", upload.single("file"), (req, res) => {
     return res.status(400).json({ error: "No file uploaded" });
   }
 
+  // Build the full absolute path to the uploaded file
   const filePath = path.join(uploadDir, req.file.filename);
+  
+  // Verify file existence
+  if (!fs.existsSync(filePath)) {
+    return res.status(500).json({ error: "Uploaded file not found" });
+  }
 
-  // Run malware_scan.py using dynamic Python path
-  exec(`${process.env.PYTHON_PATH || "python3"} malware_scan.py "${filePath}"`, (error, stdout, stderr) => {
-    if (error) {
-      console.error(`Error running malware scan: ${stderr}`);
-      return res.status(500).json({ error: "Error running malware scan" });
-    }
+  // Build the absolute path to the Python script
+  const pythonScriptPath = path.join(__dirname, "malware_scan.py");
 
-    res.json({ 
-      message: "Malware scan completed",
-      result: stdout.trim(), 
-      filename: req.file.filename 
-    });
-  });
+  // Run malware_scan.py using dynamic Python path and absolute paths
+  exec(`"C:\\Python313\\python.exe" "${pythonScriptPath}" "${filePath}"`, (error, stdout, stderr) => {
+  console.log("Raw stdout:", stdout);
+  console.log("Raw stderr:", stderr);
+
+  if (error && !stdout) {
+  return res.status(500).json({ error: `Error running malware scan: ${stderr || error.message}` });
+}
+
+  // Extract only the last meaningful line
+  const result = stdout.trim().split("\n").pop();
+  
+  res.json({ message: result });
+});
+
 });
 
 // Start the server
