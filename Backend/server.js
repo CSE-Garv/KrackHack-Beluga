@@ -18,7 +18,7 @@ if (!fs.existsSync(uploadDir)) {
 
 // CORS Configuration
 app.use(cors({
-  origin: "*",  // Allow all origins (change to frontend URL in production)
+  origin: "*",  // This should allow all origins; if not, try specifying your frontend's URL explicitly.
   methods: "GET, POST",
   allowedHeaders: "Content-Type, Authorization"
 }));
@@ -29,15 +29,18 @@ const storage = multer.diskStorage({
     cb(null, uploadDir);
   },
   filename: (req, file, cb) => {
-    const newFilename = `uploaded_${Date.now()}${path.extname(file.originalname)}`;
-    cb(null, newFilename);
+    // Use the original file name, but avoid conflicts by appending timestamp
+    const fileExtension = path.extname(file.originalname);
+    const timestamp = Date.now();
+    const filename = `${timestamp}${fileExtension}`;
+    cb(null, filename);
   },
 });
 
 const upload = multer({ storage });
 
 // File upload and scan route
-app.post("/upload", upload.single("file"), (req, res) => {
+app.post("/uploads", upload.single("file"), (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: "No file uploaded" });
   }
@@ -50,24 +53,35 @@ app.post("/upload", upload.single("file"), (req, res) => {
     return res.status(500).json({ error: "Uploaded file not found" });
   }
 
-  // Build the absolute path to the Python script
+  // Dynamically get the Python interpreter path and script location
+  const pythonPath = process.env.PYTHON_PATH || "python"; // Default to "python" if not set
   const pythonScriptPath = path.join(__dirname, "malware_scan.py");
 
   // Run malware_scan.py using dynamic Python path and absolute paths
-  exec(`"C:\\Python313\\python.exe" "${pythonScriptPath}" "${filePath}"`, (error, stdout, stderr) => {
-  console.log("Raw stdout:", stdout);
-  console.log("Raw stderr:", stderr);
+  exec(`"${pythonPath}" "${pythonScriptPath}" "${filePath}"`, (error, stdout, stderr) => {
+    console.log("Raw stdout:", stdout);
+    console.log("Raw stderr:", stderr);
 
-  if (error && !stdout) {
-  return res.status(500).json({ error: `Error running malware scan: ${stderr || error.message}` });
-}
+    // If there's an error or stderr content
+    if (error || stderr) {
+      const errorMessage = stderr || error.message || "Unknown error during scan.";
+      return res.status(500).json({ error: `Error running malware scan: ${errorMessage}` });
+    }
 
-  // Extract only the last meaningful line
-  const result = stdout.trim().split("\n").pop();
-  
-  res.json({ message: result });
-});
+    // Extract the last meaningful line of stdout (result of scan)
+    const result = stdout.trim().split("\n").pop();
 
+    // Check if result is empty and handle accordingly
+    if (!result) {
+      return res.status(500).json({ error: "Failed to get scan result." });
+    }
+
+    // Send the result as a response (either "Infected" or "Clean")
+    res.json({
+      message: result,
+      filename: req.file.filename, // Send filename in the response
+    });
+  });
 });
 
 // Start the server

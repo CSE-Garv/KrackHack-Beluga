@@ -29,13 +29,16 @@ const Home = () => {
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 
   const checkForMalware = async () => {
-    if (!file) return;
+    if (!file) {
+      setScanResult("❌ No file selected");
+      return;
+    }
 
     const formData = new FormData();
     formData.append("file", file);
 
     try {
-      const response = await fetch(`${BACKEND_URL}/upload`, {
+      const response = await fetch(`${BACKEND_URL}/uploads`, {
         method: "POST",
         body: formData,
       });
@@ -47,10 +50,9 @@ const Home = () => {
       const data = await response.json();
       setScanResult(data.message);
       setUploadedFilename(data.filename); // Store updated filename
-    } 
-    catch (error) {
-    console.error("Upload Error:", error);
-    setScanResult(`❌ Error: ${error.message}`);
+    } catch (error) {
+      console.error("Error during file upload:", error);
+      setScanResult(`❌ Error: ${error.message || error}`);
     }
   };
 
@@ -62,14 +64,24 @@ const Home = () => {
       <div {...getRootProps()} className={`dropzone ${isDragActive ? "active" : ""}`}>
         <input {...getInputProps()} />
         <UploadCloud className="icon" />
-        {file ? <p>{uploadedFilename || file.name}</p> : <p>Drag & drop a file here, or click to select one</p>}
+        {file ? (
+          <p>{uploadedFilename || file.name}</p> // Use file.name as fallback if uploadedFilename is empty
+        ) : (
+          <p>Drag & drop a file here, or click to select one</p>
+        )}
       </div>
 
       <button className="scan-button" onClick={checkForMalware} disabled={!file}>
         Check for Malware
       </button>
 
-      {scanResult && <div className={`result-tile ${scanResult.includes("❌") ? "malicious" : "clean"}`}>{scanResult}</div>}
+      {scanResult && (
+        <div
+          className={`result-tile ${scanResult.includes("❌") ? "malicious" : "clean"}`}
+        >
+          {scanResult}
+        </div>
+      )}
     </div>
   );
 };
