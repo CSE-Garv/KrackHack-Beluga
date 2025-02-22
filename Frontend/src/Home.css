@@ -1,0 +1,118 @@
+/* Global Styles */
+body {
+  background: linear-gradient(135deg, #ff9a9e, #fad0c4, #fad0c4, #fbc2eb, #a18cd1);
+  background-size: 400% 400%;
+  animation: gradientAnimation 10s ease infinite;
+  font-family: "Arial", sans-serif;
+  color: rgb(16, 15, 15);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+
+/* Smooth Animation */
+@keyframes gradientAnimation {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Main Container */
+.container {
+  text-align: center;
+  width: 90%;
+  max-width: 500px;
+}
+
+/* Title */
+.title {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+/* Subtitle */
+.subtitle {
+  font-size: 1rem;
+  margin-bottom: 20px;
+}
+
+/* Drag & Drop Box */
+.dropzone {
+  border: 2px dashed rgba(169, 169, 169, 0.8); /* Grey dashed border */
+  background-color: rgba(0, 0, 0, 0.249);
+  padding: 40px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: border-color 0.3s ease, background-color 0.3s ease;
+}
+
+.dropzone p {
+  font-size: 1rem;
+}
+
+.dropzone:hover {
+  border: 2px dashed black; /* Black dashed border on hover */
+  background-color: rgba(0, 0, 0, 0.395);
+}
+
+.dropzone.active {
+  border: 2px dashed black; /* Black dashed border when dragging */
+  background-color: rgba(26, 26, 26, 0.6);
+}
+
+
+/* Icon */
+.icon {
+  width: 50px;
+  height: 50px;
+  margin-bottom: 10px;
+}
+
+/* Scan Button */
+.scan-button {
+  margin-top: 20px;
+  padding: 12px 20px;
+  font-size: 1rem;
+  font-weight: bold;
+  color: white;
+  background-color: rgba(0, 123, 255, 0.8);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.scan-button:hover {
+  background-color: rgba(0, 123, 255, 1);
+}
+
+.scan-button:disabled {
+  background-color: rgba(0, 123, 255, 0.4);
+  cursor: not-allowed;
+}
+
+/* Result Tile */
+.result-tile {
+  margin-top: 20px;
+  padding: 15px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  border-radius: 8px;
+  display: inline-block;
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.clean {
+  background-color: rgba(0, 255, 127, 0.8);
+  color: white;
+}
+
+.malicious {
+  background-color: rgba(255, 69, 0, 0.8);
+  color: white;
+}
