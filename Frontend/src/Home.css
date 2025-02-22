@@ -24,13 +24,38 @@ body {
   text-align: center;
   width: 90%;
   max-width: 500px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0px 4px 30px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 /* Title */
+@keyframes typing {
+  from {
+    width: 0;
+  }
+  to {
+    width: 79%;
+  }
+}
+
+@keyframes blink {
+  0% { border-right: 3px solid white; }
+  90% { border-right: 3px solid white; }
+  100% { border-right: 3px solid transparent; }
+}
+
 .title {
-  font-size: 2.5rem;
-  font-weight: bold;
-  margin-bottom: 10px;
+  display: inline-block;
+  font-size: 2rem;
+  border-right: 3px solid white;
+  white-space: nowrap;
+  overflow: hidden;
+  padding-right: 5px;
+  width: 14ch; /* Adjust based on text length */
+  animation: typing 2s steps(14) forwards, blink 2.5s steps(1) forwards;
 }
 
 /* Subtitle */
@@ -41,7 +66,7 @@ body {
 
 /* Drag & Drop Box */
 .dropzone {
-  border: 2px dashed rgba(169, 169, 169, 0.8); /* Grey dashed border */
+  border: 2px dashed rgba(169, 169, 169, 0.8);
   background-color: rgba(0, 0, 0, 0.249);
   padding: 40px;
   border-radius: 12px;
@@ -54,15 +79,14 @@ body {
 }
 
 .dropzone:hover {
-  border: 2px dashed black; /* Black dashed border on hover */
+  border: 2px dashed black;
   background-color: rgba(0, 0, 0, 0.395);
 }
 
 .dropzone.active {
-  border: 2px dashed black; /* Black dashed border when dragging */
+  border: 2px dashed black;
   background-color: rgba(26, 26, 26, 0.6);
 }
-
 
 /* Icon */
 .icon {
@@ -115,4 +139,98 @@ body {
 .malicious {
   background-color: rgba(255, 69, 0, 0.8);
   color: white;
+}
+
+/* Gradient Circles */
+.gradient-circles {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  z-index: -1;
+}
+
+.circle {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.6;
+  filter: blur(25px);
+  animation: floatAnimation 10s infinite alternate ease-in-out,
+             colorShiftAnimation 100s infinite linear;
+}
+
+/* Randomly place circles with different sizes */
+.circle:nth-child(1) {
+  width: 150px;
+  height: 150px;
+  top: 10%;
+  left: 20%;
+  animation-duration: 9s;
+}
+
+.circle:nth-child(2) {
+  width: 200px;
+  height: 200px;
+  top: 50%;
+  left: 70%;
+  animation-duration: 11s;
+}
+
+.circle:nth-child(3) {
+  width: 180px;
+  height: 180px;
+  top: 80%;
+  left: 40%;
+  animation-duration: 12s;
+}
+
+.circle:nth-child(4) {
+  width: 220px;
+  height: 220px;
+  top: 30%;
+  left: 10%;
+  animation-duration: 10s;
+}
+
+.circle:nth-child(5) {
+  width: 250px;
+  height: 250px;
+  top: 70%;
+  left: 80%;
+  animation-duration: 13s;
+}
+
+/* Floating Animation */
+@keyframes floatAnimation {
+  0% { transform: translateY(0px) translateX(0px); }
+  50% { transform: translateY(-15px) translateX(10px); }
+  100% { transform: translateY(20px) translateX(-10px); }
+}
+
+@keyframes colorShiftAnimation {
+  0% { background: radial-gradient(circle, rgba(255, 99, 71, 0.6), rgba(72, 209, 204, 0.2)); }
+  25% { background: radial-gradient(circle, rgba(72, 209, 204, 0.6), rgba(147, 112, 219, 0.2)); }
+  50% { background: radial-gradient(circle, rgba(147, 112, 219, 0.6), rgba(255, 165, 0, 0.2)); }
+  75% { background: radial-gradient(circle, rgba(255, 165, 0, 0.6), rgba(50, 205, 50, 0.2)); }
+  100% { background: radial-gradient(circle, rgba(50, 205, 50, 0.6), rgba(255, 99, 71, 0.2)); }
+}
+
+/* Loading Spinner */
+.loader {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top: 3px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  vertical-align: middle;
+  margin-right: 5px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }

@@ -1,18 +1,21 @@
 import React, { useState, useCallback } from "react";
 import { useDropzone } from "react-dropzone";
 import { UploadCloud } from "lucide-react";
+import Navbar from "./Components/Navbar"
+import Footer from "./Components/Footer"
 import "./Home.css";
 
 const Home = () => {
   const [file, setFile] = useState(null);
   const [scanResult, setScanResult] = useState("");
-  const [uploadedFilename, setUploadedFilename] = useState(""); // Store uploaded filename
+  const [uploadedFilename, setUploadedFilename] = useState("");
+  const [isLoading, setIsLoading] = useState(false); // Loading state
 
   const onDrop = useCallback((acceptedFiles) => {
     if (acceptedFiles.length > 0) {
       setFile(acceptedFiles[0]);
-      setUploadedFilename(""); // Reset filename on new file upload
-      setScanResult(""); // Clear previous scan result
+      setUploadedFilename("");
+      setScanResult("");
     }
   }, []);
 
@@ -34,6 +37,8 @@ const Home = () => {
       return;
     }
 
+    setIsLoading(true); // Start loading animation
+
     const formData = new FormData();
     formData.append("file", file);
 
@@ -49,40 +54,54 @@ const Home = () => {
 
       const data = await response.json();
       setScanResult(data.message);
-      setUploadedFilename(data.filename); // Store updated filename
+      setUploadedFilename(data.filename);
     } catch (error) {
       console.error("Error during file upload:", error);
       setScanResult(`❌ Error: ${error.message || error}`);
+    } finally {
+      setIsLoading(false); // Stop loading animation
     }
   };
 
   return (
-    <div className="container">
-      <h1 className="title">Malware Scanner</h1>
-      <p className="subtitle">Upload a file to check for malicious content.</p>
 
-      <div {...getRootProps()} className={`dropzone ${isDragActive ? "active" : ""}`}>
-        <input {...getInputProps()} />
-        <UploadCloud className="icon" />
-        {file ? (
-          <p>{uploadedFilename || file.name}</p> // Use file.name as fallback if uploadedFilename is empty
-        ) : (
-          <p>Drag & drop a file here, or click to select one</p>
+    <>
+
+      <Navbar />
+
+      <div className="container">
+        {/* Background Gradient Circles */}
+        <div className="gradient-circles">
+          <div className="circle circle-1"></div>
+          <div className="circle circle-2"></div>
+          <div className="circle circle-3"></div>
+          <div className="circle circle-4"></div>
+          <div className="circle circle-5"></div>
+        </div>
+
+      <h1 className="title">Malware Scanner</h1>
+        <p className="subtitle">Upload a file to check for malicious content.</p>
+
+        <div {...getRootProps()} className={`dropzone ${isDragActive ? "active" : ""}`}>
+          <input {...getInputProps()} />
+          <UploadCloud className="icon" />
+          {file ? <p>{uploadedFilename || file.name}</p> : <p>Drag & drop a file here, or click to select one</p>}
+        </div>
+
+        <button className="scan-button" onClick={checkForMalware} disabled={!file || isLoading}>
+          {isLoading ? <span className="loader"></span> : "Check for Malware"}
+        </button>
+
+        {scanResult && (
+          <div className={`result-tile ${scanResult.includes("❌") ? "malicious" : "clean"}`}>
+            {scanResult}
+          </div>
         )}
       </div>
 
-      <button className="scan-button" onClick={checkForMalware} disabled={!file}>
-        Check for Malware
-      </button>
+      <Footer />
 
-      {scanResult && (
-        <div
-          className={`result-tile ${scanResult.includes("❌") ? "malicious" : "clean"}`}
-        >
-          {scanResult}
-        </div>
-      )}
-    </div>
+    </>
   );
 };
 
