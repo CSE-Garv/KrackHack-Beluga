@@ -1,98 +1,119 @@
-/* Global Styles */
 body {
-  background: linear-gradient(135deg, #ff9a9e, #fad0c4, #fad0c4, #fbc2eb, #a18cd1);
-  background-size: 400% 400%;
-  animation: gradientAnimation 10s ease infinite;
+  position: relative; /* Establish stacking context */
+  background: rgb(0, 0, 14);
+  background-attachment: fixed;
   font-family: "Arial", sans-serif;
-  color: rgb(16, 15, 15);
+  color: white;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: repeating-linear-gradient(
+      to right,
+      rgba(37, 190, 37, 0.778) 0px,
+      rgba(37, 190, 37,0.778) 1px,
+      transparent 1px,
+      transparent 20px
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      rgba(37, 190, 37,0.778) 0px,
+      rgba(37, 190, 37,0.778) 1px,
+      transparent 1px,
+      transparent 20px
+    );
+  opacity: 0.5;
+  z-index: -1;
+}
+
+/* Title Section */
+.title-section {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
-  margin: 0;
-}
-
-/* Smooth Animation */
-@keyframes gradientAnimation {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-/* Main Container */
-.container {
   text-align: center;
-  width: 90%;
-  max-width: 500px;
-  background: rgba(255, 255, 255, 0.1);
-  padding: 30px;
-  border-radius: 16px;
-  box-shadow: 0px 4px 30px rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-/* Title */
-@keyframes typing {
-  from {
-    width: 0;
-  }
-  to {
-    width: 79%;
-  }
-}
-
-@keyframes blink {
-  0% { border-right: 3px solid white; }
-  90% { border-right: 3px solid white; }
-  100% { border-right: 3px solid transparent; }
+  position: relative;
+  flex-direction: column;
 }
 
 .title {
-  display: inline-block;
-  font-size: 2rem;
-  border-right: 3px solid white;
-  white-space: nowrap;
-  overflow: hidden;
-  padding-right: 5px;
-  width: 14ch; /* Adjust based on text length */
-  animation: typing 2s steps(14) forwards, blink 2.5s steps(1) forwards;
+  font-size: 8rem; /* Large font size */
+  font-weight: bold;
+  z-index: 1;
+  color: #fef3c6;
+  line-height: 1.1; /* Slightly tighter line height for better control over space */
+  padding: 20px 40px; /* Adds extra space around the text */
+  border: 2px solid rgba(37, 190, 37, 0.8); /* Green border */
+  background-color: rgba(37, 190, 37, 0.1); /* Translucent green background */
+  border-radius: 16px; /* Rounded corners */
+  display: inline-block; /* Makes the border fit the text size */
 }
 
-/* Subtitle */
-.subtitle {
-  font-size: 1rem;
-  margin-bottom: 20px;
+/* Upload Section */
+.upload-section {
+  text-align: center;
+  padding: 50px 20px;
+  background: rgba(37, 190, 37, 0.3); /* Updated to translucent green */
+  backdrop-filter: blur(5px);
+  border-radius: 16px;
+  box-shadow: 0px 4px 30px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  margin: 100px auto;
+  opacity: 0;
+  transform: translateY(50px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+  width: 60%;
+}
+
+/* Show Upload Section when in View */
+body.scrolled .upload-section {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 1.2s ease-out, transform 1.2s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
 /* Drag & Drop Box */
 .dropzone {
   border: 2px dashed rgba(169, 169, 169, 0.8);
-  background-color: rgba(0, 0, 0, 0.249);
+  background-color: rgba(255, 255, 255, 0.05);
   padding: 40px;
   border-radius: 12px;
   cursor: pointer;
   transition: border-color 0.3s ease, background-color 0.3s ease;
-}
-
-.dropzone p {
-  font-size: 1rem;
-}
-
-.dropzone:hover {
-  border: 2px dashed black;
-  background-color: rgba(0, 0, 0, 0.395);
+  width: 60%;
+  height: 200px;
+  margin: auto;
+  margin-top: 60px;
+  margin-bottom: 60px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
 }
 
 .dropzone.active {
-  border: 2px dashed black;
-  background-color: rgba(26, 26, 26, 0.6);
+  border-color: rgb(48, 76, 181);
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
-/* Icon */
-.icon {
-  width: 50px;
-  height: 50px;
-  margin-bottom: 10px;
+.dropzone .icon {
+  margin-bottom: 20px; /* Adds space between the icon and the text */
+  font-size: 3rem; /* Adjust the size of the cloud icon */
+}
+
+.dropzone p {
+  margin: 0; /* Removes any margin from the text */
 }
 
 /* Scan Button */
@@ -141,96 +162,94 @@ body {
   color: white;
 }
 
-/* Gradient Circles */
-.gradient-circles {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
-  z-index: -1;
-}
-
-.circle {
-  position: absolute;
-  border-radius: 50%;
-  opacity: 0.6;
-  filter: blur(25px);
-  animation: floatAnimation 10s infinite alternate ease-in-out,
-             colorShiftAnimation 100s infinite linear;
-}
-
-/* Randomly place circles with different sizes */
-.circle:nth-child(1) {
-  width: 150px;
-  height: 150px;
-  top: 10%;
-  left: 20%;
-  animation-duration: 9s;
-}
-
-.circle:nth-child(2) {
-  width: 200px;
-  height: 200px;
-  top: 50%;
-  left: 70%;
-  animation-duration: 11s;
-}
-
-.circle:nth-child(3) {
-  width: 180px;
-  height: 180px;
-  top: 80%;
-  left: 40%;
-  animation-duration: 12s;
-}
-
-.circle:nth-child(4) {
-  width: 220px;
-  height: 220px;
-  top: 30%;
-  left: 10%;
-  animation-duration: 10s;
-}
-
-.circle:nth-child(5) {
-  width: 250px;
-  height: 250px;
-  top: 70%;
-  left: 80%;
-  animation-duration: 13s;
-}
-
-/* Floating Animation */
-@keyframes floatAnimation {
-  0% { transform: translateY(0px) translateX(0px); }
-  50% { transform: translateY(-15px) translateX(10px); }
-  100% { transform: translateY(20px) translateX(-10px); }
-}
-
-@keyframes colorShiftAnimation {
-  0% { background: radial-gradient(circle, rgba(255, 99, 71, 0.6), rgba(72, 209, 204, 0.2)); }
-  25% { background: radial-gradient(circle, rgba(72, 209, 204, 0.6), rgba(147, 112, 219, 0.2)); }
-  50% { background: radial-gradient(circle, rgba(147, 112, 219, 0.6), rgba(255, 165, 0, 0.2)); }
-  75% { background: radial-gradient(circle, rgba(255, 165, 0, 0.6), rgba(50, 205, 50, 0.2)); }
-  100% { background: radial-gradient(circle, rgba(50, 205, 50, 0.6), rgba(255, 99, 71, 0.2)); }
-}
-
-/* Loading Spinner */
-.loader {
+.cursor {
   display: inline-block;
-  width: 20px;
-  height: 20px;
-  border: 3px solid rgba(255, 255, 255, 0.3);
-  border-top: 3px solid white;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  vertical-align: middle;
-  margin-right: 5px;
+  width: 0.5em; /* Width of the block cursor (adjust as needed) */
+  height: 1em; /* Height of the block cursor */
+  background-color: transparent; /* Make the inside transparent */
+  border: 2px solid white; /* Visible border of the cursor */
+  vertical-align: bottom; /* Align it with the text */
+  transition: opacity 0.3s ease-in-out;
 }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+/* To make it visible when active */
+.cursor.visible {
+  opacity: 1;
+}
+
+/* To make it invisible when not active */
+.cursor:not(.visible) {
+  opacity: 0;
+}
+
+::selection {
+  background-color: rgba(37, 190, 37, 0.5); /* Light green background */
+  color: white; /* White text color when selected */
+}
+
+.subtitle{
+  font-size: 1.5rem;
+}
+
+/* Update dropzone class when a file is selected */
+.dropzone.file-selected {
+  border-color: #007bff; /* Blue border when file is selected */
+}
+
+/* Style for the remove icon (cross icon) */
+.remove-icon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #ff0000; /* Red color */
+  transition: color 0.3s;
+}
+
+.remove-icon:hover {
+  color: #d40000; /* Darker red when hovering */
+}
+
+/* File Info (filename and remove X) */
+.file-info {
+  display: flex;
+  justify-content: center;  /* Center both horizontally */
+  align-items: center;      /* Center both vertically */
+  width: 100%;
+}
+
+.file-info p {
+  margin: 0;
+  flex-grow: 1;  /* Allow the filename to take up available space */
+  text-align: center; /* Center the filename text */
+}
+
+.remove-file {
+  background: none;
+  border: none;
+  color: red;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: color 0.3s ease;
+  margin-left: 10px; /* Add space between file name and X */
+}
+
+.remove-file:hover {
+  color: darkred;
+}
+
+/* Box around the file and cross (X) */
+.file-box {
+  display: flex;
+  justify-content: center;  /* Center horizontally */
+  align-items: center;      /* Center vertically */
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(169, 169, 169, 0.8);
+  border-radius: 8px;
+  padding: 10px;
+  margin-top: 20px;
+  width: 100%;
+  max-width: 400px; /* Adjust width as needed */
+  position: relative; /* Allows absolute positioning of the X icon */
 }
