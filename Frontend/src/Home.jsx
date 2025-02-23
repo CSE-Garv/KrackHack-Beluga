@@ -7,8 +7,6 @@ import Footer from "./Components/Footer";
 import "./Home.css";
 
 const Home = () => {
-
-  
   const [file, setFile] = useState(null);
   const [scanResult, setScanResult] = useState("");
   const [uploadedFilename, setUploadedFilename] = useState("");
@@ -43,23 +41,23 @@ const Home = () => {
   }, []);
 
   const onDrop = useCallback((acceptedFiles) => {
-  if (acceptedFiles.length > 0) {
-    const selectedFile = acceptedFiles[0];
-    
-    // Check file size (in bytes)
-    const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB in bytes
-    if (selectedFile.size > MAX_FILE_SIZE) {
-      setScanResult(["❌ Max size limit: 10 MB"]);
-      return;
+    if (acceptedFiles.length > 0) {
+      const selectedFile = acceptedFiles[0];
+
+      // Check file size (in bytes)
+      const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB in bytes
+      if (selectedFile.size > MAX_FILE_SIZE) {
+        setScanResult(["❌ Max size limit: 10 MB"]);
+        setRiskScore(null); // Ensure risk score is reset
+        return; // Stop further execution if the file size exceeds limit
+      }
+
+      setFile(selectedFile);
+      setUploadedFilename("");
+      setScanResult("");
+      setRiskScore(null); // Reset riskScore when a new file is uploaded
     }
-
-    setFile(selectedFile);
-    setUploadedFilename("");
-    setScanResult("");
-    setRiskScore(null); // Reset riskScore when a new file is uploaded
-  }
-}, []);
-
+  }, []);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -68,83 +66,87 @@ const Home = () => {
       "application/pdf": [".pdf"],
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document": [".docx"],
       "application/x-msdownload": [".exe"],
+      "application/msword": [".doc"],  // Added for .doc file support
     },
   });
 
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 
-const checkForMalware = async () => {
-  if (!file) {
-    setScanResult(["❌ No file selected"]);
-    return;
-  }
-
-  setIsLoading(true);
-
-  const formData = new FormData();
-  formData.append("file", file);
-
-  try {
-    const response = await fetch(`${BACKEND_URL}/uploads`, {
-      method: "POST",
-      body: formData,
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || "Failed to upload file");
+  const checkForMalware = async () => {
+    if (!file) {
+      setScanResult(["❌ No file selected"]);
+      return;
     }
 
-    const data = await response.json();
+    setIsLoading(true);
 
-    // Build a detailed result as an array of strings
-    let resultArray = [`📜 Output: ${data.final_result || "No message from server."}`]; // Concatenate title and answer
+    const formData = new FormData();
+    formData.append("file", file);
 
-    if (data.virustotal_hits !== null) {
-      resultArray.push(`🛡️ VirusTotal Hits: ${data.virustotal_hits}`);
+    try {
+      const response = await fetch(`${BACKEND_URL}/uploads`, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to upload file");
+      }
+
+      const data = await response.json();
+
+      // Build a detailed result as an array of strings
+      let resultArray = [`📜 Output: ${data.final_result || "No message from server."}`]; // Concatenate title and answer
+
+      if (data.virustotal_hits !== null) {
+        resultArray.push(`🛡 VirusTotal Hits: ${data.virustotal_hits}`);
+      }
+
+      if (data.pe_info) {
+        resultArray.push(`💻 PE Info: ${JSON.stringify(data.pe_info, null, 2)}`);
+      }
+
+      if (data.pdf_info) {
+        resultArray.push(`📄 PDF Info: ${JSON.stringify(data.pdf_info, null, 2)}`);
+      }
+
+      if (data.docx_info) {
+        resultArray.push(`📝 DOCX Info: ${JSON.stringify(data.docx_info, null, 2)}`);
+      }
+
+      if (data.doc_info) { // Added for .doc file info
+        resultArray.push(`📝 DOC Info: ${JSON.stringify(data.doc_info, null, 2)}`);
+      }
+
+      if (data.yara_matches && data.yara_matches.length > 0) {
+        resultArray.push(`🔍 YARA Matches: ${data.yara_matches.join(", ")}`); // Join matches in one line
+      }
+
+      if (data.stdout) {
+        resultArray.push(`✅ Stdout: ${data.stdout}`);
+      }
+
+      if (data.details) {
+        resultArray.push(`⚠ Details: ${data.details}`);
+      }
+
+      if (data.errors) {
+        resultArray.push(`❌ Errors: ${data.errors}`);
+      }
+
+      // Update state with the formatted result array
+      setScanResult(resultArray);
+      setUploadedFilename(data.filename || "Unknown filename");
+      setRiskScore(data.risk_score !== undefined ? data.risk_score : "N/A");
+
+    } catch (error) {
+      console.error("Error during file upload:", error);
+      setScanResult([`❌ Error: ${error.message || error}`]);
+    } finally {
+      setIsLoading(false);
     }
-
-    if (data.pe_info) {
-      resultArray.push(`💻 PE Info: ${JSON.stringify(data.pe_info, null, 2)}`);
-    }
-
-    if (data.pdf_info) {
-      resultArray.push(`📄 PDF Info: ${JSON.stringify(data.pdf_info, null, 2)}`);
-    }
-
-    if (data.docx_info) {
-      resultArray.push(`📝 DOCX Info: ${JSON.stringify(data.docx_info, null, 2)}`);
-    }
-
-    if (data.yara_matches && data.yara_matches.length > 0) {
-      resultArray.push(`🔍 YARA Matches: ${data.yara_matches.join(", ")}`); // Join matches in one line
-    }
-
-    if (data.stdout) {
-      resultArray.push(`✅ Stdout: ${data.stdout}`);
-    }
-
-    if (data.details) {
-      resultArray.push(`⚠️ Details: ${data.details}`);
-    }
-
-    if (data.errors) {
-      resultArray.push(`❌ Errors: ${data.errors}`);
-    }
-
-    // Update state with the formatted result array
-    setScanResult(resultArray);
-    setUploadedFilename(data.filename || "Unknown filename");
-    setRiskScore(data.risk_score !== undefined ? data.risk_score : "N/A");
-
-  } catch (error) {
-    console.error("Error during file upload:", error);
-    setScanResult([`❌ Error: ${error.message || error}`]);
-  } finally {
-    setIsLoading(false);
-  }
-};
-
+  };
 
   const resetScan = () => {
     setFile(null);
@@ -169,7 +171,6 @@ const checkForMalware = async () => {
 
   return (
     <>
-      
       <Navbar />
 
       <div className="title-section">
@@ -183,7 +184,6 @@ const checkForMalware = async () => {
           <ChevronDown className="arrow-icon third-arrow" size="9rem" />
         </div>
       </div>
-
 
       <div className="upload-section">
         <p className="subtitle">Upload a file to check for malicious content.</p>
@@ -226,12 +226,9 @@ const checkForMalware = async () => {
             </div>
           </>
         )}
-
-
       </div>
 
       <Footer />
-      
     </>
   );
 };

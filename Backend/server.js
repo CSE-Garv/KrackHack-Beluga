@@ -24,7 +24,7 @@ app.use(cors({
 }));
 
 // Allowed file extensions and size limit (10MB)
-const ALLOWED_EXTENSIONS = [".exe", ".pdf", ".docx", ".doc"];
+const ALLOWED_EXTENSIONS = [".exe", ".dll", ".pdf", ".docx", ".doc"];
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
 // Multer storage configuration
@@ -41,9 +41,9 @@ const storage = multer.diskStorage({
 // Multer file filter
 const fileFilter = (req, file, cb) => {
   const fileExtension = path.extname(file.originalname).toLowerCase();
-  
+
   if (!ALLOWED_EXTENSIONS.includes(fileExtension)) {
-    return cb(new Error("Invalid file type. Only .exe, .pdf, and .docx are allowed."));
+    return cb(new Error("Invalid file type. Only .exe, .dll, .pdf, .docx, and .doc are allowed."));
   }
   cb(null, true);
 };
@@ -88,7 +88,7 @@ app.post("/uploads", upload.single("file"), (req, res) => {
     console.log("Python stderr:", errorOutput);
 
     if (code !== 0 || errorOutput.trim().length > 0) {
-      return res.status(500).json({ error: "Error running malware scan", details: errorOutput, stdout: output });
+      return res.status(500).json({ error: `Error running malware scan`, details: errorOutput, stdout: output });
     }
 
     try {
