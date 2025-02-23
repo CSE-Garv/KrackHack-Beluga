@@ -1,4 +1,4 @@
-# Malware Detection Web Application
+## Malware Detection Web Application
 
 ## Overview
 This is a **Malware Detection Web Application** that allows users to upload files for malware analysis. The system performs multiple static analysis checks and integrates with **VirusTotal API** to detect potential threats.
@@ -13,6 +13,45 @@ This is a **Malware Detection Web Application** that allows users to upload file
 - **Yara Scan:** Provides additional malware assessment.
 - **Risk Scoring:** Displays a malware risk score for uploaded files.
 - **Modern UI:** Built with **React**, featuring a responsive and interactive design.
+
+## Repository Structure
+```
+KrackHack-25-Malware/
+│── Backend/
+│   │── myenv/               # Python virtual environment
+│   │── node_modules/        # Backend dependencies
+│   │── uploads/             # Uploaded files storage
+│   │── .env                 # Environment variables
+│   │── malware_scan.py      # Python script for malware scanning
+│   │── package-lock.json    # Node.js package lock file
+│   │── package.json         # Node.js dependencies
+│   │── server.js            # Backend server (Express.js)
+│   │── yara_rules.yar       # YARA rule set for malware detection
+│
+│── Frontend/
+│   │── node_modules/        # Frontend dependencies
+│   │── public/              # Static assets
+│   │── src/                 # React source code
+|   |   |── Components/      # Contains reusable UI components
+|   |   |   |── Footer.css   # Styles for the Footer component
+|   |   |   |── Footer.jsx   # Footer component (React)
+|   |   |   |── Navbar.css   # Styles for the Navbar component
+|   |   |   |── Navbar.jsx   # Navigation bar component (React)
+|   |   |── App.css          # Global styles for the main App component
+|   |   |── App.jsx          # Root component that manages the application structure
+|   |   |── Home.css         # Styles for the Home page
+|   |   |── Home.jsx         # Home page component (React)
+|   |   |── main.jsx         # Entry point for React application, renders App component
+│   │── .env                 # Frontend environment variables
+│   │── eslint.config.js     # ESLint configuration
+│   │── index.html           # Main frontend HTML file
+│   │── package-lock.json    # Frontend package lock file
+│   │── package.json         # Frontend dependencies
+│   │── vite.config.js       # Vite configuration for frontend
+│
+│── .gitignore               # Ignore unnecessary files
+│── README.md                # Documentation
+```
 
 ## Tech Stack
 ### Frontend:
@@ -61,16 +100,18 @@ cd ../Backend
 python -m venv myenv  # Create a virtual environment
 source myenv/bin/activate  # Activate on macOS/Linux
 myenv\Scripts\activate  # Activate on Windows (cmd)
-myenv\Scripts\Activate.ps1 #Activate on Windows (powershell)
+myenv\Scripts\Activate.ps1 # Activate on Windows (powershell)
 
 pip install yara-python pefile pdfplumber olefile requests dotenv
 ```
-If Python Virtual Environment Already Present then SKIP
 
 ### 3. Set Up Environment Variables
 Edit the `.env` file in the backend directory:
 ```sh
 VIRUSTOTAL_API_KEY=your_api_key_here
+UPLOAD_DIR=uploads
+PYTHON_PATH=C:\Users\your_user\anaconda3\python.exe
+PORT=5000
 ```
 
 ### 4. Run the Application
@@ -79,13 +120,44 @@ VIRUSTOTAL_API_KEY=your_api_key_here
 cd Backend
 source myenv/bin/activate  # Activate virtual environment (macOS/Linux)
 myenv\Scripts\activate  # Activate virtual environment (Windows-CMD)
-myenv\Scripts\Activate.ps1 #Activate virtual environment (Windows-powershell)
+myenv\Scripts\Activate.ps1 # Activate virtual environment (Windows-powershell)
 node server.js
 
 # Start the frontend
 cd ../Frontend
 npm run dev
 ```
+
+## Backend Code Summary
+The **backend** is implemented using **Node.js & Express.js**, handling file uploads and running malware scans via a **Python script**.
+
+### **Key Functionalities in `server.js`**
+- **File Upload Handling**
+  - Uses `multer` for file uploads (supports `.exe, .dll, .pdf, .docx, .doc`).
+  - Stores files in the `uploads/` directory.
+
+- **Python Malware Scan Execution**
+  - Spawns a Python process to execute `malware_scan.py` with the uploaded file as an argument.
+  - Captures output and sends JSON results back to the client.
+
+- **CORS Configuration**
+  - Allows cross-origin requests from the frontend.
+
+- **Error Handling**
+  - Handles file format errors and API failures.
+
+### **File Scan Process**
+1. **Upload a file** via API.
+2. **Server saves the file** and validates its format.
+3. **Python script analyzes the file**, checking:
+   - **Entropy (Packed/Obfuscated files)**
+   - **Suspicious Imports (DLL Calls)**
+   - **PDF & DOCX Macro Analysis**
+   - **YARA Rules for Malware Detection**
+   - **VirusTotal Malware Signature Database**
+4. **Results returned to the client** as JSON.
+
+---
 
 ## Usage
 1. **Upload a file** via the drag-and-drop interface.
@@ -102,4 +174,3 @@ npm run dev
 
 ---
 **Disclaimer:** This tool provides **static analysis** and should not be used as a sole security measure. Always use it in combination with other security practices.
-
