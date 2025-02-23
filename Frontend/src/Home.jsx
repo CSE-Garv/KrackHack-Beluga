@@ -1,8 +1,6 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
-import { UploadCloud, X } from "lucide-react"; // Import cross icon
-import Navbar from "./Components/Navbar";
-import Footer from "./Components/Footer";
+import { UploadCloud } from "lucide-react"; // Import UploadCloud icon
 import "./Home.css";
 
 const Home = () => {
@@ -10,8 +8,9 @@ const Home = () => {
   const [scanResult, setScanResult] = useState("");
   const [uploadedFilename, setUploadedFilename] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [riskScore, setRiskScore] = useState(null); // Added riskScore state
   const [typedText, setTypedText] = useState("");
-  const [showCursor, setShowCursor] = useState(true); // Controls cursor blinking
+  const [showCursor, setShowCursor] = useState(true);
   const fullText = "Malware Scanner";
 
   // Typing Effect Logic
@@ -24,7 +23,7 @@ const Home = () => {
       if (index > fullText.length) {
         clearInterval(typingInterval);
       }
-    }, 100); // Adjust speed if needed
+    }, 100);
 
     return () => clearInterval(typingInterval);
   }, []);
@@ -33,7 +32,7 @@ const Home = () => {
   useEffect(() => {
     const cursorInterval = setInterval(() => {
       setShowCursor((prev) => !prev);
-    }, 500); // Cursor blinks every 500ms
+    }, 500);
 
     return () => clearInterval(cursorInterval);
   }, []);
@@ -43,6 +42,7 @@ const Home = () => {
       setFile(acceptedFiles[0]);
       setUploadedFilename("");
       setScanResult("");
+      setRiskScore(null); // Reset riskScore when a new file is uploaded
     }
   }, []);
 
@@ -82,6 +82,7 @@ const Home = () => {
       const data = await response.json();
       setScanResult(data.message);
       setUploadedFilename(data.filename);
+      setRiskScore(data.riskScore || null); // Ensure riskScore is updated
     } catch (error) {
       console.error("Error during file upload:", error);
       setScanResult(`❌ Error: ${error.message || error}`);
@@ -94,12 +95,7 @@ const Home = () => {
     setFile(null);
     setScanResult("");
     setUploadedFilename("");
-  };
-
-  const removeFile = () => {
-    setFile(null);
-    setUploadedFilename("");
-    setScanResult("");
+    setRiskScore(null);
   };
 
   // Detect scroll to toggle class
@@ -118,35 +114,35 @@ const Home = () => {
 
   return (
     <>
+      
       <div className="title-section">
         <h1 className="title">
           {typedText}
           <span className={`cursor ${showCursor ? "visible" : ""}`}></span>
         </h1>
+        <div className="scroll-indicator"> V </div>
       </div>
+
 
       <div className="upload-section">
         <p className="subtitle">Upload a file to check for malicious content.</p>
 
-       <div {...getRootProps()} className={`dropzone ${isDragActive ? "active" : ""}`}>
-  <input {...getInputProps()} />
-  {file ? (
-    <div className="file-box">
-      <div className="file-info">
-        <p>{file.name}</p>  {/* Display the original file name */}
-        <button className="remove-file" onClick={resetScan}>❌</button> {/* Cross to remove file */}
-      </div>
-    </div>
-  ) : (
-    <div>
-      <UploadCloud className="icon" />
-      <p>Drag & drop a file here, or click to select one</p>
-    </div>
-  )}
-</div>
-
-
-
+        <div {...getRootProps()} className={`dropzone ${isDragActive ? "active" : ""}`}>
+          <input {...getInputProps()} />
+          {file ? (
+            <div className="file-box">
+              <div className="file-info">
+                <p>{file.name}</p> {/* Display the original file name */}
+                <button className="remove-file" onClick={resetScan}>❌</button> {/* Cross to remove file */}
+              </div>
+            </div>
+          ) : (
+            <div>
+              <UploadCloud className="icon" />
+              <p>Drag & drop a file here, or click to select one</p>
+            </div>
+          )}
+        </div>
 
         {!scanResult && (
           <button className="scan-button" onClick={checkForMalware} disabled={!file || isLoading}>
@@ -157,7 +153,8 @@ const Home = () => {
         {scanResult && (
           <>
             <div className={`result-tile ${scanResult.includes("❌") ? "malicious" : "clean"}`}>
-              {scanResult}
+              <p>{scanResult}</p>
+              {riskScore !== null && <p>Risk Score: {riskScore}</p>}
             </div>
             <div className="check-another-section">
               <button className="scan-button" onClick={resetScan}>
@@ -167,6 +164,7 @@ const Home = () => {
           </>
         )}
       </div>
+      
     </>
   );
 };

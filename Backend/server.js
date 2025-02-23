@@ -1,9 +1,9 @@
-require("dotenv").config(); // Load environment variables
+require("dotenv").config();
 
 const express = require("express");
 const cors = require("cors");
 const multer = require("multer");
-const { exec } = require("child_process");
+const { spawn } = require("child_process");
 const path = require("path");
 const fs = require("fs");
 
@@ -13,12 +13,12 @@ const uploadDir = path.join(__dirname, process.env.UPLOAD_DIR || "uploads");
 
 // Ensure uploads folder exists
 if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir);
+  fs.mkdirSync(uploadDir, { recursive: true });
 }
 
 // CORS Configuration
 app.use(cors({
-  origin: "*",  // This should allow all origins; if not, try specifying your frontend's URL explicitly.
+  origin: "*",
   methods: "GET, POST",
   allowedHeaders: "Content-Type, Authorization"
 }));
@@ -29,11 +29,9 @@ const storage = multer.diskStorage({
     cb(null, uploadDir);
   },
   filename: (req, file, cb) => {
-    // Use the original file name, but avoid conflicts by appending timestamp
     const fileExtension = path.extname(file.originalname);
     const timestamp = Date.now();
-    const filename = `${timestamp}${fileExtension}`;
-    cb(null, filename);
+    cb(null, `${timestamp}${fileExtension}`);
   },
 });
 
@@ -45,41 +43,73 @@ app.post("/uploads", upload.single("file"), (req, res) => {
     return res.status(400).json({ error: "No file uploaded" });
   }
 
-  // Build the full absolute path to the uploaded file
   const filePath = path.join(uploadDir, req.file.filename);
-  
-  // Verify file existence
+
   if (!fs.existsSync(filePath)) {
     return res.status(500).json({ error: "Uploaded file not found" });
   }
 
-  // Dynamically get the Python interpreter path and script location
-  const pythonPath = process.env.PYTHON_PATH || "python"; // Default to "python" if not set
+  const pythonPath = process.env.PYTHON_PATH || "python"; 
   const pythonScriptPath = path.join(__dirname, "malware_scan.py");
 
-  // Run malware_scan.py using dynamic Python path and absolute paths
-  exec(`"${pythonPath}" "${pythonScriptPath}" "${filePath}"`, (error, stdout, stderr) => {
-    console.log("Raw stdout:", stdout);
-    console.log("Raw stderr:", stderr);
+  console.log(`Running: ${pythonPath} ${pythonScriptPath} ${filePath}`);
 
-    // If there's an error or stderr content
-    if (error || stderr) {
-      const errorMessage = stderr || error.message || "Unknown error during scan.";
-      return res.status(500).json({ error: `Error running malware scan: ${errorMessage}` });
+  const pythonProcess = spawn(pythonPath, [pythonScriptPath, filePath]);
+
+  let output = "";
+  let errorOutput = "";
+
+  pythonProcess.stdout.on("data", (data) => {
+    output += data.toString();
+  });
+
+  pythonProcess.stderr.on("data", (data) => {
+    errorOutput += data.toString();
+  });
+
+  pythonProcess.on("close", (code) => {
+    console.log("Python stdout:", output);
+    console.log("Python stderr:", errorOutput);
+
+    if (code !== 0 || errorOutput.trim().length > 0) {
+      return res.status(500).json({ error: "Error running malware scan", details: errorOutput });
     }
 
-    // Extract the last meaningful line of stdout (result of scan)
-    const result = stdout.trim().split("\n").pop();
-
-    // Check if result is empty and handle accordingly
-    if (!result) {
-      return res.status(500).json({ error: "Failed to get scan result." });
+    // Ensure output is valid
+    const lines = output.trim().split("\n");
+    if (lines.length < 3) {
+      return res.status(500).json({ error: "Unexpected Python script output", details: output });
     }
 
-    // Send the result as a response (either "Infected" or "Clean")
+    // ✅ Extract the actual risk score using regex
+    let riskScoreLine = lines.find(line => line.toLowerCase().includes("final risk score"));
+    let riskScore = "Unknown";
+    if (riskScoreLine) {
+    const match = riskScoreLine.match(/(\d+(\.\d+)?)/); // Capture decimal numbers like 4.5
+      if (match) {
+        riskScore = `${match[1]}/10`; // Converts "4.5" to "4.5/10"
+        // Extracted "8" or similar format
+      }
+    }
+
+
+    // ✅ Get the last line as the result (Clean, Infected, etc.)
+    let result = lines[lines.length - 1]?.trim().toLowerCase();
+
+    // Standardize result output
+    if (result.includes("infected")) {
+      result = "Infected";
+    } else if (result.includes("clean")) {
+      result = "Clean";
+    } else if (result.includes("suspicious")) {
+      result = "Suspicious";
+    } else {
+      result = "Unknown";
+    }
+
     res.json({
       message: result,
-      filename: req.file.filename, // Send filename in the response
+      riskScore: riskScore, // Correctly extracted "2/10"
     });
   });
 });
