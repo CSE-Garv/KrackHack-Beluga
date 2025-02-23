@@ -100,7 +100,7 @@ npm run dev
 ## Contributors
 - **Dhairya Sharma**
 - **Garv Jain**
-- **Parth Gawande**
+- **Parth Ashok Gawande**
 - **Dishant Jha**
 
 ---
