@@ -85,9 +85,10 @@ const Home = () => {
       }
 
       const data = await response.json();
-      setScanResult(data.message);
-      setUploadedFilename(data.filename);
-      setRiskScore(data.riskScore || null); // Ensure riskScore is updated
+      setScanResult(data.final_result || "No message received from server.");
+      setUploadedFilename(data.filename || "Unknown filename");
+      setRiskScore(data.risk_score !== undefined ? data.risk_score : "N/A");
+
     } catch (error) {
       console.error("Error during file upload:", error);
       setScanResult(`❌ Error: ${error.message || error}`);

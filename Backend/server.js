@@ -23,28 +23,44 @@ app.use(cors({
   allowedHeaders: "Content-Type, Authorization"
 }));
 
+// Allowed file extensions and size limit (10MB)
+const ALLOWED_EXTENSIONS = [".exe", ".pdf", ".docx"];
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+
 // Multer storage configuration
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, uploadDir);
   },
   filename: (req, file, cb) => {
-    const fileExtension = path.extname(file.originalname);
-    const timestamp = Date.now();
-    cb(null, `${timestamp}${fileExtension}`);
+    const fileExtension = path.extname(file.originalname).toLowerCase();
+    cb(null, `${Date.now()}${fileExtension}`);
   },
 });
 
-const upload = multer({ storage });
+// Multer file filter
+const fileFilter = (req, file, cb) => {
+  const fileExtension = path.extname(file.originalname).toLowerCase();
+  
+  if (!ALLOWED_EXTENSIONS.includes(fileExtension)) {
+    return cb(new Error("Invalid file type. Only .exe, .pdf, and .docx are allowed."));
+  }
+  cb(null, true);
+};
+
+const upload = multer({
+  storage,
+  fileFilter,
+  limits: { fileSize: MAX_FILE_SIZE }
+});
 
 // File upload and scan route
 app.post("/uploads", upload.single("file"), (req, res) => {
   if (!req.file) {
-    return res.status(400).json({ error: "No file uploaded" });
+    return res.status(400).json({ error: "No file uploaded or file type not allowed." });
   }
 
   const filePath = path.join(uploadDir, req.file.filename);
-
   if (!fs.existsSync(filePath)) {
     return res.status(500).json({ error: "Uploaded file not found" });
   }
@@ -75,43 +91,23 @@ app.post("/uploads", upload.single("file"), (req, res) => {
       return res.status(500).json({ error: "Error running malware scan", details: errorOutput });
     }
 
-    // Ensure output is valid
-    const lines = output.trim().split("\n");
-    if (lines.length < 3) {
-      return res.status(500).json({ error: "Unexpected Python script output", details: output });
+    try {
+      const resultData = JSON.parse(output.trim()); // Parse JSON output from Python
+      res.json(resultData);
+    } catch (e) {
+      return res.status(500).json({ error: "Failed to parse Python script output", details: output });
     }
-
-    // ✅ Extract the actual risk score using regex
-    let riskScoreLine = lines.find(line => line.toLowerCase().includes("final risk score"));
-    let riskScore = "Unknown";
-    if (riskScoreLine) {
-    const match = riskScoreLine.match(/(\d+(\.\d+)?)/); // Capture decimal numbers like 4.5
-      if (match) {
-        riskScore = `${match[1]}/10`; // Converts "4.5" to "4.5/10"
-        // Extracted "8" or similar format
-      }
-    }
-
-
-    // ✅ Get the last line as the result (Clean, Infected, etc.)
-    let result = lines[lines.length - 1]?.trim().toLowerCase();
-
-    // Standardize result output
-    if (result.includes("infected")) {
-      result = "Infected";
-    } else if (result.includes("clean")) {
-      result = "Clean";
-    } else if (result.includes("suspicious")) {
-      result = "Suspicious";
-    } else {
-      result = "Unknown";
-    }
-
-    res.json({
-      message: result,
-      riskScore: riskScore, // Correctly extracted "2/10"
-    });
   });
+});
+
+// Error handling for Multer
+app.use((err, req, res, next) => {
+  if (err instanceof multer.MulterError) {
+    return res.status(400).json({ error: `Multer error: ${err.message}` });
+  } else if (err) {
+    return res.status(400).json({ error: err.message });
+  }
+  next();
 });
 
 // Start the server
