@@ -1,6 +1,8 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
 import { UploadCloud } from "lucide-react"; // Import UploadCloud icon
+import { ChevronDown } from "lucide-react"; // Import the ChevronDown icon
+import Navbar from "./Components/Navbar";
 import "./Home.css";
 
 const Home = () => {
@@ -115,12 +117,17 @@ const Home = () => {
   return (
     <>
       
+      <Navbar />
       <div className="title-section">
         <h1 className="title">
           {typedText}
           <span className={`cursor ${showCursor ? "visible" : ""}`}></span>
         </h1>
-        <div className="scroll-indicator"> V </div>
+        <div className="scroll-indicator">
+          <ChevronDown className="arrow-icon first-arrow" size="9rem" />
+          <ChevronDown className="arrow-icon second-arrow" size="9rem" />
+          <ChevronDown className="arrow-icon third-arrow" size="9rem" />
+        </div>
       </div>
 
 

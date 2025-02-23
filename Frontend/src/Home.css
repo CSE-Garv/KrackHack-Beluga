@@ -256,13 +256,40 @@ body.scrolled .upload-section {
 
 /* Scroll Indicator */
 .scroll-indicator {
-  font-size: 6rem;
+  font-size: 16rem; /* Increase the icon size */
   font-weight: bold;
   color: rgba(37, 190, 37, 0.8); /* Green color similar to border */
   margin-top: 20px;
   opacity: 0;  /* Initially hidden */
   transform: translateY(0);
-  animation: fadeInBounce 1.5s ease-in-out 2s forwards, bounce 1.5s infinite alternate ease-in-out 3s;
+  display: flex;
+  flex-direction: column; /* Stack arrows vertically */
+  justify-content: center; /* Center content vertically */
+  align-items: center; /* Center content horizontally */
+  animation: fadeInBounce 1.5s ease-in-out forwards, bounce 1.5s infinite alternate ease-in-out 3s;
+}
+
+.arrow-icon {
+  margin: 5px 0; /* Adds space between the arrows */
+  font-size: 18rem; /* Increases the size of the arrow icon */
+  font-weight: bold; /* Makes the icon thicker */
+  text-shadow: 0 0 5px rgba(37, 190, 37, 0.8); /* Adds a glowing effect to make it look thicker */
+  margin-top: 0;
+  margin-bottom: 0;
+  animation: fadeInBounce 1.5s ease-in-out forwards, bounce 1.5s infinite alternate ease-in-out 3s;
+
+}
+
+.scroll-indicator, .arrow-icon {
+  animation: fadeInBounce 1.5s ease-in-out forwards, bounce 1.5s infinite alternate ease-in-out;
+}
+
+.second-arrow {
+  margin-top: -90px;
+}
+
+.third-arrow {
+  margin-top: -90px;
 }
 
 /* Fade-in + Bouncing Animation */
@@ -283,6 +310,18 @@ body.scrolled .upload-section {
   100% {
     transform: translateY(15px);
     opacity: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .title {
+    font-size: 4rem; 
+  }
+}
+
+@media (max-width: 768px) {
+  .dropzone {
+    width: 90%;
   }
 }
 

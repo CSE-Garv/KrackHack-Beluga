@@ -1,15 +1,38 @@
 .navbar {
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 60px;
-  background: #2c3e50;
-  color: white; 
+  background: #292b1836;
+  color: rgb(104, 225, 74);
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  border-bottom: 3px solid rgb(104, 225, 74); /* Green bottom border */
+  display: flex;
+  align-items: center;
+  overflow: hidden;
 }
 
-.logo {
-  font-size: 1rem;
-  font-weight: bold; 
+.marquee {
+  display: flex;
+  width: 200%; /* Ensure enough space for seamless scrolling */
+  overflow: hidden;
+  position: relative;
+}
+
+.marquee span {
+  display: inline-block;
+  white-space: nowrap;
+  padding-right: 100%;
+  padding-top: 10px;
+  animation: marquee 20s linear infinite;
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0%);
+  }
+  to {
+    transform: translateX(-50%);
+  }
 }
