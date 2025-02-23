@@ -43,13 +43,23 @@ const Home = () => {
   }, []);
 
   const onDrop = useCallback((acceptedFiles) => {
-    if (acceptedFiles.length > 0) {
-      setFile(acceptedFiles[0]);
-      setUploadedFilename("");
-      setScanResult("");
-      setRiskScore(null); // Reset riskScore when a new file is uploaded
+  if (acceptedFiles.length > 0) {
+    const selectedFile = acceptedFiles[0];
+    
+    // Check file size (in bytes)
+    const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB in bytes
+    if (selectedFile.size > MAX_FILE_SIZE) {
+      setScanResult(["❌ Max size limit: 10 MB"]);
+      return;
     }
-  }, []);
+
+    setFile(selectedFile);
+    setUploadedFilename("");
+    setScanResult("");
+    setRiskScore(null); // Reset riskScore when a new file is uploaded
+  }
+}, []);
+
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -63,9 +73,9 @@ const Home = () => {
 
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 
-  const checkForMalware = async () => {
+const checkForMalware = async () => {
   if (!file) {
-    setScanResult("❌ No file selected");
+    setScanResult(["❌ No file selected"]);
     return;
   }
 
@@ -87,59 +97,49 @@ const Home = () => {
 
     const data = await response.json();
 
-    // 📝 Build a detailed result string
+    // Build a detailed result as an array of strings
+    let resultArray = [`📜 Output: ${data.final_result || "No message from server."}`]; // Concatenate title and answer
 
-   let resultText = `📜 Output:\n${data.final_result || "No message from server."}\n`;
+    if (data.virustotal_hits !== null) {
+      resultArray.push(`🛡️ VirusTotal Hits: ${data.virustotal_hits}`);
+    }
 
+    if (data.pe_info) {
+      resultArray.push(`💻 PE Info: ${JSON.stringify(data.pe_info, null, 2)}`);
+    }
 
+    if (data.pdf_info) {
+      resultArray.push(`📄 PDF Info: ${JSON.stringify(data.pdf_info, null, 2)}`);
+    }
 
-if (data.virustotal_hits !== null) {
-  resultText += `\n🛡️ VirusTotal Hits:\n${data.virustotal_hits}\n`;
-}
+    if (data.docx_info) {
+      resultArray.push(`📝 DOCX Info: ${JSON.stringify(data.docx_info, null, 2)}`);
+    }
 
-if (data.pe_info) {
-  resultText += `\n💻 PE Info:\n${JSON.stringify(data.pe_info, null, 2)}\n`;
-}
+    if (data.yara_matches && data.yara_matches.length > 0) {
+      resultArray.push(`🔍 YARA Matches: ${data.yara_matches.join(", ")}`); // Join matches in one line
+    }
 
-if (data.pdf_info) {
-  resultText += `\n📄 PDF Info:\n${JSON.stringify(data.pdf_info, null, 2)}\n`;
-}
+    if (data.stdout) {
+      resultArray.push(`✅ Stdout: ${data.stdout}`);
+    }
 
-if (data.docx_info) {
-  resultText += `\n📝 DOCX Info:\n${JSON.stringify(data.docx_info, null, 2)}\n`;
-}
+    if (data.details) {
+      resultArray.push(`⚠️ Details: ${data.details}`);
+    }
 
-if (data.yara_matches && data.yara_matches.length > 0) {
-  resultText += `\n🔍 YARA Matches:\n${data.yara_matches.join("\n")}\n`;
-}
+    if (data.errors) {
+      resultArray.push(`❌ Errors: ${data.errors}`);
+    }
 
-if (data.stdout) {
-  resultText += `\n✅ Stdout:\n${data.stdout}\n`;
-}
-
-if (data.details) {
-  resultText += `\n⚠️ Details:\n${data.details}\n`;
-}
-
-if (data.errors) {
-  resultText += `\n❌ Errors:\n${data.errors}\n`;
-}
-
-// Update state with the full formatted result
-setScanResult(resultText);
-
-
-   
-
-
-    // Update state with the full result
-    setScanResult(resultText);
+    // Update state with the formatted result array
+    setScanResult(resultArray);
     setUploadedFilename(data.filename || "Unknown filename");
     setRiskScore(data.risk_score !== undefined ? data.risk_score : "N/A");
 
   } catch (error) {
     console.error("Error during file upload:", error);
-    setScanResult(`❌ Error: ${error.message || error}`);
+    setScanResult([`❌ Error: ${error.message || error}`]);
   } finally {
     setIsLoading(false);
   }
@@ -213,8 +213,10 @@ setScanResult(resultText);
 
         {scanResult && (
           <>
-            <div className={`result-tile ${scanResult.includes("❌") ? "malicious" : "clean"}`}>
-              <p>{scanResult}</p>
+            <div className={`result-tile ${scanResult.some(line => line.includes("❌")) ? "malicious" : "clean"}`}>
+              {scanResult.map((line, index) => (
+                <p key={index}>{line}</p> // Each line will be printed in the same container
+              ))}
               {riskScore !== null && <p>Risk Score: {riskScore}</p>}
             </div>
             <div className="check-another-section">
@@ -224,6 +226,8 @@ setScanResult(resultText);
             </div>
           </>
         )}
+
+
       </div>
 
       <Footer />

@@ -24,7 +24,7 @@ app.use(cors({
 }));
 
 // Allowed file extensions and size limit (10MB)
-const ALLOWED_EXTENSIONS = [".exe", ".pdf", ".docx"];
+const ALLOWED_EXTENSIONS = [".exe", ".pdf", ".docx", ".doc"];
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
 // Multer storage configuration
