@@ -88,7 +88,7 @@ app.post("/uploads", upload.single("file"), (req, res) => {
     console.log("Python stderr:", errorOutput);
 
     if (code !== 0 || errorOutput.trim().length > 0) {
-      return res.status(500).json({ error: "Error running malware scan", details: errorOutput });
+      return res.status(500).json({ error: "Error running malware scan", details: errorOutput, stdout: output });
     }
 
     try {

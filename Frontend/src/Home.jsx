@@ -64,38 +64,87 @@ const Home = () => {
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 
   const checkForMalware = async () => {
-    if (!file) {
-      setScanResult("❌ No file selected");
-      return;
+  if (!file) {
+    setScanResult("❌ No file selected");
+    return;
+  }
+
+  setIsLoading(true);
+
+  const formData = new FormData();
+  formData.append("file", file);
+
+  try {
+    const response = await fetch(`${BACKEND_URL}/uploads`, {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Failed to upload file");
     }
 
-    setIsLoading(true);
+    const data = await response.json();
 
-    const formData = new FormData();
-    formData.append("file", file);
+    // 📝 Build a detailed result string
 
-    try {
-      const response = await fetch(`${BACKEND_URL}/uploads`, {
-        method: "POST",
-        body: formData,
-      });
+   let resultText = `📜 Output:\n${data.final_result || "No message from server."}\n`;
 
-      if (!response.ok) {
-        throw new Error("Failed to upload file");
-      }
 
-      const data = await response.json();
-      setScanResult(data.final_result || "No message received from server.");
-      setUploadedFilename(data.filename || "Unknown filename");
-      setRiskScore(data.risk_score !== undefined ? data.risk_score : "N/A");
 
-    } catch (error) {
-      console.error("Error during file upload:", error);
-      setScanResult(`❌ Error: ${error.message || error}`);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+if (data.virustotal_hits !== null) {
+  resultText += `\n🛡️ VirusTotal Hits:\n${data.virustotal_hits}\n`;
+}
+
+if (data.pe_info) {
+  resultText += `\n💻 PE Info:\n${JSON.stringify(data.pe_info, null, 2)}\n`;
+}
+
+if (data.pdf_info) {
+  resultText += `\n📄 PDF Info:\n${JSON.stringify(data.pdf_info, null, 2)}\n`;
+}
+
+if (data.docx_info) {
+  resultText += `\n📝 DOCX Info:\n${JSON.stringify(data.docx_info, null, 2)}\n`;
+}
+
+if (data.yara_matches && data.yara_matches.length > 0) {
+  resultText += `\n🔍 YARA Matches:\n${data.yara_matches.join("\n")}\n`;
+}
+
+if (data.stdout) {
+  resultText += `\n✅ Stdout:\n${data.stdout}\n`;
+}
+
+if (data.details) {
+  resultText += `\n⚠️ Details:\n${data.details}\n`;
+}
+
+if (data.errors) {
+  resultText += `\n❌ Errors:\n${data.errors}\n`;
+}
+
+// Update state with the full formatted result
+setScanResult(resultText);
+
+
+   
+
+
+    // Update state with the full result
+    setScanResult(resultText);
+    setUploadedFilename(data.filename || "Unknown filename");
+    setRiskScore(data.risk_score !== undefined ? data.risk_score : "N/A");
+
+  } catch (error) {
+    console.error("Error during file upload:", error);
+    setScanResult(`❌ Error: ${error.message || error}`);
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
   const resetScan = () => {
     setFile(null);
