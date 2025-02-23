@@ -3,9 +3,12 @@ import { useDropzone } from "react-dropzone";
 import { UploadCloud } from "lucide-react"; // Import UploadCloud icon
 import { ChevronDown } from "lucide-react"; // Import the ChevronDown icon
 import Navbar from "./Components/Navbar";
+import Footer from "./Components/Footer";
 import "./Home.css";
 
 const Home = () => {
+
+  
   const [file, setFile] = useState(null);
   const [scanResult, setScanResult] = useState("");
   const [uploadedFilename, setUploadedFilename] = useState("");
@@ -118,6 +121,7 @@ const Home = () => {
     <>
       
       <Navbar />
+
       <div className="title-section">
         <h1 className="title">
           {typedText}
@@ -171,6 +175,8 @@ const Home = () => {
           </>
         )}
       </div>
+
+      <Footer />
       
     </>
   );

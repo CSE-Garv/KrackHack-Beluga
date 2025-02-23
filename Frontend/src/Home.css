@@ -1,6 +1,6 @@
 body {
   position: relative; /* Establish stacking context */
-  background: rgb(0, 0, 14);
+  background: rgb(14, 14, 20);
   background-attachment: fixed;
   font-family: "Arial", sans-serif;
   color: white;
@@ -19,15 +19,15 @@ body::before {
   height: 100vh;
   background: repeating-linear-gradient(
       to right,
-      rgba(37, 190, 37, 0.778) 0px,
-      rgba(37, 190, 37,0.778) 1px,
+      rgba(18, 74, 18, 0.778) 0px,
+      rgba(18, 74, 18, 0.778) 1px,
       transparent 1px,
       transparent 20px
     ),
     repeating-linear-gradient(
       to bottom,
-      rgba(37, 190, 37,0.778) 0px,
-      rgba(37, 190, 37,0.778) 1px,
+      rgba(18, 74, 18, 0.778) 0px,
+      rgba(18, 74, 18, 0.778) 1px,
       transparent 1px,
       transparent 20px
     );
@@ -57,23 +57,10 @@ body::before {
   background-color: rgba(37, 190, 37, 0.1); /* Translucent green background */
   border-radius: 16px; /* Rounded corners */
   display: inline-block; /* Makes the border fit the text size */
+  backdrop-filter: blur(1.5px) saturate(200%); /* Strong blur for frosted glass effect */
+  -webkit-backdrop-filter: blur(10px) saturate(150%); /* Safari support */
 }
 
-/* Upload Section */
-.upload-section {
-  text-align: center;
-  padding: 50px 20px;
-  background: rgba(37, 190, 37, 0.3); /* Updated to translucent green */
-  backdrop-filter: blur(5px);
-  border-radius: 16px;
-  box-shadow: 0px 4px 30px rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  margin: 100px auto;
-  opacity: 0;
-  transform: translateY(50px);
-  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
-  width: 60%;
-}
 
 /* Show Upload Section when in View */
 body.scrolled .upload-section {
@@ -83,61 +70,7 @@ body.scrolled .upload-section {
 }
 
 /* Drag & Drop Box */
-.dropzone {
-  border: 2px dashed rgba(169, 169, 169, 0.8);
-  background-color: rgba(255, 255, 255, 0.05);
-  padding: 40px;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: border-color 0.3s ease, background-color 0.3s ease;
-  width: 60%;
-  height: 200px;
-  margin: auto;
-  margin-top: 60px;
-  margin-bottom: 60px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-}
 
-.dropzone.active {
-  border-color: rgb(48, 76, 181);
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
-.dropzone .icon {
-  margin-bottom: 20px; /* Adds space between the icon and the text */
-  font-size: 3rem; /* Adjust the size of the cloud icon */
-}
-
-.dropzone p {
-  margin: 0; /* Removes any margin from the text */
-}
-
-/* Scan Button */
-.scan-button {
-  margin-top: 20px;
-  padding: 12px 20px;
-  font-size: 1rem;
-  font-weight: bold;
-  color: white;
-  background-color: rgba(0, 123, 255, 0.8);
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.scan-button:hover {
-  background-color: rgba(0, 123, 255, 1);
-}
-
-.scan-button:disabled {
-  background-color: rgba(0, 123, 255, 0.4);
-  cursor: not-allowed;
-}
 
 /* Result Tile */
 .result-tile {
@@ -189,6 +122,7 @@ body.scrolled .upload-section {
 
 .subtitle{
   font-size: 1.5rem;
+  color: rgba(255, 255, 255, 0.8);
 }
 
 /* Update dropzone class when a file is selected */
@@ -290,6 +224,7 @@ body.scrolled .upload-section {
 
 .third-arrow {
   margin-top: -90px;
+  animation-delay: 0.7s;
 }
 
 /* Fade-in + Bouncing Animation */
@@ -325,4 +260,124 @@ body.scrolled .upload-section {
   }
 }
 
+
+/* Subtitle Text */
+.subtitle {
+  font-size: 2rem;
+  color: #e7e0c3; 
+}
+
+/* Scan Button */
+.scan-button {
+  margin-top: 20px;
+  padding: 12px 20px;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #0A0A0A; /* Dark background for contrast */
+  background-color: rgba(0, 255, 0, 0.8); /* Bright neon green */
+  border: 2px solid rgba(0, 255, 0, 1);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  text-shadow: 0 0 5px rgba(0, 255, 0, 0.7);
+}
+
+.scan-button:hover {
+  background-color: rgba(0, 255, 0, 1); /* More intense green */
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.9);
+}
+
+.scan-button:disabled {
+  background-color: rgba(0, 255, 0, 0.4);
+  cursor: not-allowed;
+}
+
+/* Subtitle Text */
+.subtitle {
+  font-size: 1.5rem;
+  color: #929a9a; /* Light cyan */
+}
+
+/* Scan Button */
+.scan-button {
+  margin-top: 20px;
+  padding: 12px 20px;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #0A0A0A; /* Dark text */
+  background-color: rgba(0, 255, 0, 0.8); /* Bright neon green */
+  border: 2px solid rgba(0, 255, 0, 1);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  text-shadow: 0 0 5px rgba(0, 255, 0, 0.7);
+}
+
+.scan-button:hover {
+  background-color: rgba(0, 255, 0, 1);
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.9);
+}
+
+.scan-button:disabled {
+  background-color: rgba(0, 255, 0, 0.4);
+  cursor: not-allowed;
+}
+
+/* Dropzone (File Upload Box) */
+.dropzone {
+  border: 2px dashed rgba(0, 255, 0, 0.6);
+  padding: 40px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: border-color 0.3s ease, background-color 0.3s ease;
+  width: 60%;
+  height: 200px;
+  margin: auto;
+  margin-top: 60px;
+  margin-bottom: 60px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  background-color: #121212;
+  box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
+}
+
+.dropzone.active {
+  border-color: rgba(0, 255, 0, 1);
+  background-color: rgba(0, 255, 0, 0.1);
+  box-shadow: 0 0 15px rgba(0, 255, 0, 0.8);
+}
+
+/* Dropzone Icons */
+.dropzone .icon {
+  margin-bottom: 20px;
+  font-size: 3rem;
+  color: #c4d7d7; /* Light cyan */
+  text-shadow: 0 0 8px rgba(35, 147, 147, 0.7);
+}
+
+.dropzone p {
+  margin: 0;
+  color: #FFFFFF; /* White for better readability */
+  font-size: 1.1rem;
+}
+
+/* Upload Section */
+.upload-section {
+  text-align: center;
+  padding: 50px 20px;
+  background: rgba(15, 15, 15, 0.95);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px) saturate(150%);
+  border-radius: 16px;
+  box-shadow: 0px 4px 30px rgba(0, 255, 0, 0.2);
+  border: 2px solid rgba(0, 255, 0, 0.5);; /* Magenta border */
+  margin: 100px auto;
+  opacity: 0;
+  transform: translateY(50px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+  width: 60%;
+}
 
