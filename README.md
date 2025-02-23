@@ -24,7 +24,6 @@ This is a **Malware Detection Web Application** that allows users to upload file
 - **Node.js & Express.js**
 - **VirusTotal API** for malware analysis
 - **Custom Python Scripts** for entropy checking & static analysis
-- **MongoDB** for local data storage (if needed)
 
 ### Python Analysis Tools:
 - **yara** for rule-based malware detection
@@ -61,19 +60,16 @@ npm install
 cd ../Backend
 python -m venv myenv  # Create a virtual environment
 source myenv/bin/activate  # Activate on macOS/Linux
-myenv\Scripts\activate  # Activate on Windows
+myenv\Scripts\activate  # Activate on Windows (cmd)
+myenv\Scripts\Activate.ps1 #Activate on Windows (powershell)
 
-pip install yara-python pefile pdfplumber olefile requests
+pip install yara-python pefile pdfplumber olefile requests dotenv
 ```
-Alternatively, install everything from `requirements.txt` (if available):
-```sh
-pip install -r requirements.txt
-```
+If Python Virtual Environment Already Present then SKIP
 
 ### 3. Set Up Environment Variables
-Create a `.env` file in the backend directory:
+Edit the `.env` file in the backend directory:
 ```sh
-VITE_BACKEND_URL=http://localhost:5000
 VIRUSTOTAL_API_KEY=your_api_key_here
 ```
 
@@ -82,7 +78,8 @@ VIRUSTOTAL_API_KEY=your_api_key_here
 # Start the backend server
 cd Backend
 source myenv/bin/activate  # Activate virtual environment (macOS/Linux)
-myenv\Scripts\activate  # Activate virtual environment (Windows)
+myenv\Scripts\activate  # Activate virtual environment (Windows-CMD)
+myenv\Scripts\Activate.ps1 #Activate virtual environment (Windows-powershell)
 node server.js
 
 # Start the frontend
