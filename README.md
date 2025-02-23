@@ -1,9 +1,9 @@
 # Malware Detection Web Application
 
-## 🚀 Overview
+## Overview
 This is a **Malware Detection Web Application** that allows users to upload files for malware analysis. The system performs multiple static analysis checks and integrates with **VirusTotal API** to detect potential threats.
 
-## 🛠️ Features
+## Features
 - **File Upload & Analysis:** Supports **PDF, DOCX, EXE** file formats.
 - **VirusTotal API Integration:** Scans files against known malware signatures.
 - **Entropy Checking:** Identifies packed or obfuscated files.
@@ -14,7 +14,7 @@ This is a **Malware Detection Web Application** that allows users to upload file
 - **Risk Scoring:** Displays a malware risk score for uploaded files.
 - **Modern UI:** Built with **React**, featuring a responsive and interactive design.
 
-## 🏷️ Tech Stack
+## Tech Stack
 ### Frontend:
 - **React.js** (JSX, Tailwind CSS for styling)
 - **Lucide React Icons** (for UI enhancements)
@@ -35,11 +35,11 @@ This is a **Malware Detection Web Application** that allows users to upload file
 - **hashlib** for file hashing
 - **math & json** for data processing
 
-## 🛠️ Setup & Installation
+## Setup & Installation
 ### 1. Clone the Repository
 ```sh
 git clone https://github.com/your-repo/malware-scanner.git
-cd KRACKHACK-25-MALWARE
+cd KrackHack-25-Malware
 ```
 
 ### 2. Install Dependencies
@@ -90,19 +90,19 @@ cd ../Frontend
 npm run dev
 ```
 
-## 📌 Usage
+## Usage
 1. **Upload a file** via the drag-and-drop interface.
 2. Click **Scan** to analyze the file.
 3. View the **malware detection results & risk score**.
 4. Check **detailed reports** for potential threats.
 5. Upload another file or analyze further.
 
-## 🤝 Contributors
+## Contributors
 - **Dhairya Sharma**
 - **Garv Jain**
 - **Parth Gawande**
 - **Dishant Jha**
 
 ---
-🚨 **Disclaimer:** This tool provides **static analysis** and should not be used as a sole security measure. Always use it in combination with other security practices.
+**Disclaimer:** This tool provides **static analysis** and should not be used as a sole security measure. Always use it in combination with other security practices.
 
