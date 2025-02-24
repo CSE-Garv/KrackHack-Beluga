@@ -106,12 +106,16 @@ pip install yara-python pefile pdfplumber olefile requests dotenv
 ```
 
 ### 3. Set Up Environment Variables
-Edit the `.env` file in the backend directory:
+Create `.env` file in the backend directory:
 ```sh
 VIRUSTOTAL_API_KEY=your_api_key_here
 UPLOAD_DIR=uploads
-PYTHON_PATH=C:\Users\your_user\anaconda3\python.exe
+PYTHON_PATH=your_python.exe_file_path_here
 PORT=5000
+```
+Create `.env` file in the frontend directory:
+```sh
+VITE_BACKEND_URL=http://localhost:5000
 ```
 
 ### 4. Run the Application
